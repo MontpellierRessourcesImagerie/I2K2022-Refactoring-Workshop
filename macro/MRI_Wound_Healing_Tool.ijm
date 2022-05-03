@@ -22,10 +22,7 @@ var methods = newArray("variance", "find edges");
 var method = "variance";
 var measureInPixelUnits = false;
 
-//runTests();
-for (i=0; i<100; i++) {
-    runTests();
-}
+runTests();
 exit
 
 macro "Unused Tool - C037" { }
