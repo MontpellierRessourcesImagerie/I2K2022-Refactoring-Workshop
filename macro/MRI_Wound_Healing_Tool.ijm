@@ -14,13 +14,13 @@
 
 
 var helpURL = "https://github.com/MontpellierRessourcesImagerie/imagej_macros_and_scripts/wiki/Wound-Healing-Tool"
-var varianceFilterRadius = 10;
-var threshold = 50;
-var radiusOpen = 4;
-var minSize = 10000;
-var methods = newArray("variance", "find edges");
-var method = "variance";
-var measureInPixelUnits = false;
+var VARIANCE_FILTER_RADIUS = 10;
+var THRESHOLD = 50;
+var RADIUS_OPEN = 4;
+var MINIMAL_SIZE = 10000;
+var METHODS = newArray("variance", "find edges");
+var METHOD = "variance";
+var MEASURE_IN_PIXEL_UNITS = false;
 
 runTests();
 exit
@@ -41,20 +41,20 @@ macro 'Batch Measure Wound Healing Action Tool - C000T4b12b' {
 
 macro 'Measure Wound Healing Action Tool Options' {
      Dialog.create("Wound Healing Tool Options");
-     Dialog.addChoice("method", methods, method);
-     Dialog.addNumber("variance filter radius", varianceFilterRadius);
-     Dialog.addNumber("threshold", threshold);
-     Dialog.addNumber("radius open", radiusOpen);
-     Dialog.addNumber("min. size", minSize);
-     Dialog.addCheckbox("ignore spatial calibration", measureInPixelUnits);
+     Dialog.addChoice("METHOD", METHODS, METHOD);
+     Dialog.addNumber("variance filter radius", VARIANCE_FILTER_RADIUS);
+     Dialog.addNumber("THRESHOLD", THRESHOLD);
+     Dialog.addNumber("radius open", RADIUS_OPEN);
+     Dialog.addNumber("min. size", MINIMAL_SIZE);
+     Dialog.addCheckbox("ignore spatial calibration", MEASURE_IN_PIXEL_UNITS);
      Dialog.show();
      
-     method = Dialog.getChoice();
-     varianceFilterRadius= Dialog.getNumber();
-     threshold= Dialog.getNumber();
-     radiusOpen = Dialog.getNumber();
-     minSize = Dialog.getNumber();
-     measureInPixelUnits = Dialog.getCheckbox();
+     METHOD = Dialog.getChoice();
+     VARIANCE_FILTER_RADIUS= Dialog.getNumber();
+     THRESHOLD= Dialog.getNumber();
+     RADIUS_OPEN = Dialog.getNumber();
+     MINIMAL_SIZE = Dialog.getNumber();
+     MEASURE_IN_PIXEL_UNITS = Dialog.getCheckbox();
 }
 
 function batchMeasureImages() {
@@ -99,7 +99,7 @@ function batchMeasureImages() {
 
 function measureActiveImage() {
 	run("Select None");
-	if (measureInPixelUnits)
+	if (MEASURE_IN_PIXEL_UNITS)
     	run("Set Scale...", "distance=0 known=0 pixel=1 unit=pixel");
 	getPixelSize(unit, pixelWidth, pixelHeight);
 	run("Duplicate...", "duplicate");
@@ -107,23 +107,23 @@ function measureActiveImage() {
     setBackgroundColor(255, 255, 255);
     roiManager("reset")
     roiManager("Associate", "true");
-    if (method=="variance") 
+    if (METHOD=="variance") 
         thresholdVariance();
     else 
         thresholdFindEdges();
     run("Convert to Mask", " black");
     resetThreshold();
     run("Invert", "stack");
-    for (i=0; i<radiusOpen; i++) {
+    for (i=0; i<RADIUS_OPEN; i++) {
         run("Dilate", "stack");
     }
-    for (i=0; i<radiusOpen; i++) {
+    for (i=0; i<RADIUS_OPEN; i++) {
         run("Erode", "stack");
     }
     run("Select All");
-    run("Enlarge...", "enlarge=-" + radiusOpen + " pixel");
+    run("Enlarge...", "enlarge=-" + RADIUS_OPEN + " pixel");
     run("Invert", "stack");
-    run("Analyze Particles...", "size="+minSize+"-Infinity circularity=0.00-1.00 show=Nothing add stack");
+    run("Analyze Particles...", "size="+MINIMAL_SIZE+"-Infinity circularity=0.00-1.00 show=Nothing add stack");
     close();
     run("Clear Results");
     roiManager("Measure"); 
@@ -137,9 +137,9 @@ function isInputImage(name) {
 }
 
 function thresholdVariance() {
-    run("Variance...", "radius=" + varianceFilterRadius + " stack");
+    run("Variance...", "radius=" + VARIANCE_FILTER_RADIUS + " stack");
     run("8-bit");
-    setThreshold(0,threshold);
+    setThreshold(0, THRESHOLD);
 }
 
 function thresholdFindEdges() {
@@ -171,7 +171,7 @@ function testIsInputImage() {
 
 function testThresholdVariance() {
     setBatchMode(true);
-    varianceFilterRadius = 1;
+    VARIANCE_FILTER_RADIUS = 1;
     newImage("Untitled", "8-bit ramp", 16, 16, 1);
     setBatchMode(true);
     thresholdVariance();
@@ -179,7 +179,7 @@ function testThresholdVariance() {
     variance0x0 = getPixel(0, 0);
     variance7x7 = getPixel(7, 7);
     variance15x15 = getPixel(15, 15);
-    result = (upper==threshold);
+    result = (upper==THRESHOLD);
     result = result && (variance0x0==57);
     result = result && (variance7x7==171);
     result = result && (variance15x15==57);
@@ -208,11 +208,11 @@ function testThresholdFindEdges() {
 function testMeasureActiveImageVariance() {
     setBatchMode(true);
     createTestImage();
-    method = "variance";
-    varianceFilterRadius = 1;
-    threshold = 1;
-    radiusOpen = 1;
-    minSize = 50;
+    METHOD = "variance";
+    VARIANCE_FILTER_RADIUS = 1;
+    THRESHOLD = 1;
+    RADIUS_OPEN = 1;
+    MINIMAL_SIZE = 50;
     measureActiveImage();
     roiManager("Select", 0);
     getSelectionBounds(x, y, width, height);
@@ -229,10 +229,10 @@ function testMeasureActiveImageVariance() {
 function testMeasureActiveImageFindEdges() {
     setBatchMode(true);
     createTestImage();
-    method = "find edges";
-    threshold = 1;
-    radiusOpen = 1;
-    minSize = 50;
+    METHOD = "find edges";
+    THRESHOLD = 1;
+    RADIUS_OPEN = 1;
+    MINIMAL_SIZE = 50;
     measureActiveImage();
     roiManager("Select", 0);
     getSelectionBounds(x, y, width, height);
