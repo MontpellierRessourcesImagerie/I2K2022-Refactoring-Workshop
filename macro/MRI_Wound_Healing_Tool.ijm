@@ -101,7 +101,6 @@ function measureActiveImage() {
 	run("Select None");
 	if (MEASURE_IN_PIXEL_UNITS)
     	run("Set Scale...", "distance=0 known=0 pixel=1 unit=pixel");
-	getPixelSize(unit, pixelWidth, pixelHeight);
 	run("Duplicate...", "duplicate");
     setForegroundColor(0, 0, 0);
     setBackgroundColor(255, 255, 255);
