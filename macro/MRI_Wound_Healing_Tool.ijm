@@ -41,9 +41,9 @@ macro 'Batch Measure Wound Healing Action Tool - C000T4b12b' {
 
 macro 'Measure Wound Healing Action Tool Options' {
      Dialog.create("Wound Healing Tool Options");
-     Dialog.addChoice("METHOD", METHODS, METHOD);
+     Dialog.addChoice("method", METHODS, METHOD);
      Dialog.addNumber("variance filter radius", VARIANCE_FILTER_RADIUS);
-     Dialog.addNumber("THRESHOLD", THRESHOLD);
+     Dialog.addNumber("threshol", THRESHOLD);
      Dialog.addNumber("radius open", RADIUS_OPEN);
      Dialog.addNumber("min. size", MINIMAL_SIZE);
      Dialog.addCheckbox("ignore spatial calibration", MEASURE_IN_PIXEL_UNITS);
