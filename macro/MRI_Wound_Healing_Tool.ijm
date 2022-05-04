@@ -16,7 +16,7 @@
 var helpURL = "https://github.com/MontpellierRessourcesImagerie/imagej_macros_and_scripts/wiki/Wound-Healing-Tool"
 var VARIANCE_FILTER_RADIUS = 10;
 var THRESHOLD = 50;
-var RADIUS_OPEN = 4;
+var RADIUS_CLOSE = 4;
 var MINIMAL_SIZE = 10000;
 var METHODS = newArray("variance", "find edges");
 var METHOD = "variance";
@@ -44,7 +44,7 @@ macro 'Measure Wound Healing Action Tool Options' {
      Dialog.addChoice("method", METHODS, METHOD);
      Dialog.addNumber("variance filter radius", VARIANCE_FILTER_RADIUS);
      Dialog.addNumber("threshol", THRESHOLD);
-     Dialog.addNumber("radius open", RADIUS_OPEN);
+     Dialog.addNumber("radius close", RADIUS_CLOSE);
      Dialog.addNumber("min. size", MINIMAL_SIZE);
      Dialog.addCheckbox("ignore spatial calibration", MEASURE_IN_PIXEL_UNITS);
      Dialog.show();
@@ -52,7 +52,7 @@ macro 'Measure Wound Healing Action Tool Options' {
      METHOD = Dialog.getChoice();
      VARIANCE_FILTER_RADIUS= Dialog.getNumber();
      THRESHOLD= Dialog.getNumber();
-     RADIUS_OPEN = Dialog.getNumber();
+     RADIUS_CLOSE = Dialog.getNumber();
      MINIMAL_SIZE = Dialog.getNumber();
      MEASURE_IN_PIXEL_UNITS = Dialog.getCheckbox();
 }
@@ -113,14 +113,10 @@ function measureActiveImage() {
     run("Convert to Mask", " black");
     resetThreshold();
     run("Invert", "stack");
-    for (i=0; i<RADIUS_OPEN; i++) {
-        run("Dilate", "stack");
-    }
-    for (i=0; i<RADIUS_OPEN; i++) {
-        run("Erode", "stack");
-    }
+    run("Options...", "iterations="+RADIUS_CLOSE+" count=1 black do=Close stack");
+    run("Options...", "iterations=1 count=1 black do=Nothing");
     run("Select All");
-    run("Enlarge...", "enlarge=-" + RADIUS_OPEN + " pixel");
+    run("Enlarge...", "enlarge=-" + RADIUS_CLOSE + " pixel");
     run("Invert", "stack");
     run("Analyze Particles...", "size="+MINIMAL_SIZE+"-Infinity circularity=0.00-1.00 show=Nothing add stack");
     close();
@@ -210,7 +206,7 @@ function testMeasureActiveImageVariance() {
     METHOD = "variance";
     VARIANCE_FILTER_RADIUS = 1;
     THRESHOLD = 1;
-    RADIUS_OPEN = 1;
+    RADIUS_CLOSE = 1;
     MINIMAL_SIZE = 50;
     measureActiveImage();
     roiManager("Select", 0);
@@ -230,7 +226,7 @@ function testMeasureActiveImageFindEdges() {
     createTestImage();
     METHOD = "find edges";
     THRESHOLD = 1;
-    RADIUS_OPEN = 1;
+    RADIUS_CLOSE = 1;
     MINIMAL_SIZE = 50;
     measureActiveImage();
     roiManager("Select", 0);
