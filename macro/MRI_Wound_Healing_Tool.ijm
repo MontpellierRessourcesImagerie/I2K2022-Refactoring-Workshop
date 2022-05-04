@@ -117,7 +117,6 @@ function measureActiveImage() {
     close();
     run("Clear Results");
     roiManager("Measure"); 
-//    roiManager("Show None");
 	roiManager("Show All");
 }
 
