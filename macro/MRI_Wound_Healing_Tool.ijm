@@ -98,14 +98,12 @@ function batchMeasureImages() {
 
 
 function measureActiveImage() {
-	run("Select None");
 	if (MEASURE_IN_PIXEL_UNITS)
     	run("Set Scale...", "distance=0 known=0 pixel=1 unit=pixel");
-	run("Duplicate...", "duplicate");
-    setForegroundColor(0, 0, 0);
-    setBackgroundColor(255, 255, 255);
     roiManager("reset")
-    roiManager("Associate", "true");
+    roiManager("Associate", "true");   
+    run("Select None");
+	run("Duplicate...", "duplicate");
     if (METHOD=="variance") 
         thresholdVariance();
     else 
@@ -119,7 +117,7 @@ function measureActiveImage() {
     close();
     run("Clear Results");
     roiManager("Measure"); 
-    roiManager("Show None");
+//    roiManager("Show None");
 	roiManager("Show All");
 }
 
