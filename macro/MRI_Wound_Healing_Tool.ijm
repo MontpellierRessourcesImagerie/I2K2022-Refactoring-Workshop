@@ -111,12 +111,9 @@ function measureActiveImage() {
     else 
         thresholdFindEdges();
     run("Convert to Mask", " black");
-    resetThreshold();
     run("Invert", "stack");
-    run("Options...", "iterations="+RADIUS_CLOSE+" count=1 black do=Close stack");
+    run("Options...", "iterations="+RADIUS_CLOSE+" count=1 pad black do=Close stack");
     run("Options...", "iterations=1 count=1 black do=Nothing");
-    run("Select All");
-    run("Enlarge...", "enlarge=-" + RADIUS_CLOSE + " pixel");
     run("Invert", "stack");
     run("Analyze Particles...", "size="+MINIMAL_SIZE+"-Infinity circularity=0.00-1.00 show=Nothing add stack");
     close();
