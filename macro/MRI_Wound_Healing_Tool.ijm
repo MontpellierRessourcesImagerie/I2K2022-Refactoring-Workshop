@@ -14,10 +14,10 @@
 
 
 var helpURL = "https://github.com/MontpellierRessourcesImagerie/imagej_macros_and_scripts/wiki/Wound-Healing-Tool"
-var VARIANCE_FILTER_RADIUS = 10;
-var THRESHOLD = 50;
+var VARIANCE_FILTER_RADIUS = 20;
+var THRESHOLD = 1;
 var RADIUS_CLOSE = 4;
-var MINIMAL_SIZE = 10000;
+var MINIMAL_SIZE = 999999;
 var METHODS = newArray("variance", "find edges");
 var METHOD = "variance";
 var MEASURE_IN_PIXEL_UNITS = false;
@@ -96,28 +96,48 @@ function batchMeasureImages() {
 	setBatchMode("exit and display");	
 }
 
-
 function measureActiveImage() {
-	if (MEASURE_IN_PIXEL_UNITS)
-    	run("Set Scale...", "distance=0 known=0 pixel=1 unit=pixel");
+	if (MEASURE_IN_PIXEL_UNITS) removeScale;
+    initialize();
+	createMaskWithGapAsForeground(METHOD, VARIANCE_FILTER_RADIUS, THRESHOLD);
+    applyMorphologicalCloseOnTissue(RADIUS_CLOSE);
+    createRoisOfGaps(MINIMAL_SIZE);
+    closeMask();
+    roiManager("Measure"); 
+	roiManager("Show All");
+}
+
+function removeScale() {
+    run("Set Scale...", "distance=0 known=0 pixel=1 unit=pixel");
+}
+
+function initialize() {
     roiManager("reset")
-    roiManager("Associate", "true");   
+    roiManager("Associate", "true");
+    run("Clear Results");   
     run("Select None");
-	run("Duplicate...", "duplicate");
-    if (METHOD=="variance") 
-        thresholdVariance();
+}
+
+function createMaskWithGapAsForeground(method, radius, threshold) {
+    run("Duplicate...", "duplicate");
+    if (method=="variance") 
+        thresholdVariance(radius, threshold);
     else 
         thresholdFindEdges();
     run("Convert to Mask", " black");
-    run("Invert", "stack");
-    run("Options...", "iterations="+RADIUS_CLOSE+" count=1 pad black do=Close stack");
+}
+
+function applyMorphologicalCloseOnTissue(iterations) {
+    run("Options...", "iterations="+iterations+" count=1 pad black do=Open stack");
     run("Options...", "iterations=1 count=1 black do=Nothing");
-    run("Invert", "stack");
-    run("Analyze Particles...", "size="+MINIMAL_SIZE+"-Infinity circularity=0.00-1.00 show=Nothing add stack");
+}
+
+function createRoisOfGaps(minimalArea) {
+    run("Analyze Particles...", "size="+minimalArea+"-Infinity circularity=0.00-1.00 show=Nothing add stack");
+}
+
+function closeMask() {
     close();
-    run("Clear Results");
-    roiManager("Measure"); 
-	roiManager("Show All");
 }
 
 function isInputImage(name) {
@@ -125,10 +145,10 @@ function isInputImage(name) {
 	return true;
 }
 
-function thresholdVariance() {
-    run("Variance...", "radius=" + VARIANCE_FILTER_RADIUS + " stack");
+function thresholdVariance(radius, threshold) {
+    run("Variance...", "radius=" + radius + " stack");
     run("8-bit");
-    setThreshold(0, THRESHOLD);
+    setThreshold(0, threshold);
 }
 
 function thresholdFindEdges() {
@@ -160,15 +180,13 @@ function testIsInputImage() {
 
 function testThresholdVariance() {
     setBatchMode(true);
-    VARIANCE_FILTER_RADIUS = 1;
     newImage("Untitled", "8-bit ramp", 16, 16, 1);
-    setBatchMode(true);
-    thresholdVariance();
+    thresholdVariance(1, 50);
     getThreshold(lower, upper);
     variance0x0 = getPixel(0, 0);
     variance7x7 = getPixel(7, 7);
     variance15x15 = getPixel(15, 15);
-    result = (upper==THRESHOLD);
+    result = (upper==50);
     result = result && (variance0x0==57);
     result = result && (variance7x7==171);
     result = result && (variance15x15==57);
@@ -207,9 +225,9 @@ function testMeasureActiveImageVariance() {
     getSelectionBounds(x, y, width, height);
     close();
     result = (x==5);
-    result = result && (y==1);
+    result = result && (y==0);
     result = result && (width==7);
-    result = result && (height==14);
+    result = result && (height==16);
     setBatchMode(false);
     roiManager("reset");
     return result;
@@ -227,8 +245,8 @@ function testMeasureActiveImageFindEdges() {
     getSelectionBounds(x, y, width, height);
     close();
     result = true;
-    result = result && (y==1);
-    result = result && (height==14);
+    result = result && (y==0);
+    result = result && (height==16);
     setBatchMode(false);
     roiManager("reset");
     return result;
