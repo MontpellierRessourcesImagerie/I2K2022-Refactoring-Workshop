@@ -32,11 +32,11 @@ macro "MRI Wound Healing Tool Help Action Tool - C000C111C222D07D08D09D0aD0bD0cD
 }
 
 macro 'Measure Wound Healing Action Tool - C000T4b12m' {
-	measureActiveImage();
+    measureActiveImage();
 }
 
 macro 'Batch Measure Wound Healing Action Tool - C000T4b12b' {
-	batchMeasureImages();
+    batchMeasureImages();
 }
 
 macro 'Measure Wound Healing Action Tool Options' {
@@ -58,53 +58,53 @@ macro 'Measure Wound Healing Action Tool Options' {
 }
 
 function batchMeasureImages() {
-	print("\\Clear");
-	setBatchMode(true);
-	getDateAndTime(year, month, dayOfWeek, dayOfMonth, hour, minute, second, msec);
-	print(dayOfMonth + "-" + (month+1) + "-" + year + " " + hour + ":" + minute + ":" + second + "." + msec);
-	dir = getDirectory("Select the folder containing the images");
-	files = getFileList(dir);
-	numberOfImages = 0;
-	for (i=0; i<files.length; i++) {
-		file = files[i];
-		if (isInputImage(file)) {
-			numberOfImages++;
-		}
-	}
-	counter = 1;
-	for (i=0; i<files.length; i++) {
-		file = files[i];
-		if (isInputImage(file)) {
-			print("\\Update1:Processing file " + (counter) + " of " + numberOfImages);
-			open(dir+"/"+file);
-			title = getTitle();
-			measureActiveImage();
-			outDir = dir + "/" + "control-images";
-			if (!File.exists(outDir)) {
-				File.makeDirectory(outDir);
-			}
-			save(outDir + "/" + title);
-			close();
-			selectWindow("Results");
-			saveAs("Text", dir + "/scratch_areas_" + title + ".xls");
-			counter++;
-		}
-	}
-	print("FINISHED");
-    getDateAndTime(year, month, dayOfWeek, dayOfMonth, hour, minute, second, msec);	
-	print(dayOfMonth + "-" + (month+1) + "-" + year + " " + hour + ":" + minute + ":" + second + "." + msec);
-	setBatchMode("exit and display");	
+    print("\\Clear");
+    setBatchMode(true);
+    getDateAndTime(year, month, dayOfWeek, dayOfMonth, hour, minute, second, msec);
+    print(dayOfMonth + "-" + (month+1) + "-" + year + " " + hour + ":" + minute + ":" + second + "." + msec);
+    dir = getDirectory("Select the folder containing the images");
+    files = getFileList(dir);
+    numberOfImages = 0;
+    for (i=0; i<files.length; i++) {
+        file = files[i];
+        if (isInputImage(file)) {
+            numberOfImages++;
+        }
+    }
+    counter = 1;
+    for (i=0; i<files.length; i++) {
+        file = files[i];
+        if (isInputImage(file)) {
+            print("\\Update1:Processing file " + (counter) + " of " + numberOfImages);
+            open(dir+"/"+file);
+            title = getTitle();
+            measureActiveImage();
+            outDir = dir + "/" + "control-images";
+            if (!File.exists(outDir)) {
+                File.makeDirectory(outDir);
+            }
+            save(outDir + "/" + title);
+            close();
+            selectWindow("Results");
+            saveAs("Text", dir + "/scratch_areas_" + title + ".xls");
+            counter++;
+        }
+    }
+    print("FINISHED");
+    getDateAndTime(year, month, dayOfWeek, dayOfMonth, hour, minute, second, msec);    
+    print(dayOfMonth + "-" + (month+1) + "-" + year + " " + hour + ":" + minute + ":" + second + "." + msec);
+    setBatchMode("exit and display");    
 }
 
 function measureActiveImage() {
-	if (MEASURE_IN_PIXEL_UNITS) removeScale;
+    if (MEASURE_IN_PIXEL_UNITS) removeScale;
     initialize();
-	createMaskWithGapAsForeground(METHOD, VARIANCE_FILTER_RADIUS, THRESHOLD);
+    createMaskWithGapAsForeground(METHOD, VARIANCE_FILTER_RADIUS, THRESHOLD);
     applyMorphologicalCloseOnTissue(RADIUS_CLOSE);
     createRoisOfGaps(MINIMAL_SIZE);
     closeMask();
     roiManager("Measure"); 
-	roiManager("Show All");
+    roiManager("Show All");
 }
 
 function removeScale() {
@@ -141,8 +141,8 @@ function closeMask() {
 }
 
 function isInputImage(name) {
-	if (!endsWith(name, ".tif") && !endsWith(name, ".TIF")) return false;
-	return true;
+    if (!endsWith(name, ".tif") && !endsWith(name, ".TIF")) return false;
+    return true;
 }
 
 function thresholdVariance(radius, threshold) {
