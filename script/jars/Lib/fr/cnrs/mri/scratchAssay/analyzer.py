@@ -3,11 +3,9 @@ from ij.plugin.frame import RoiManager
 from ij.measure import ResultsTable
 
 class ScratchAssayAnalyzer(object):
-
-    measureInPixelUnits = False
-    rois = None
     
     def __init__(self, image):
+        self.measureInPixlUnits = False
         self.inputImage = image
 
     def getRois(self):
@@ -43,3 +41,4 @@ class ScratchAssayAnalyzer(object):
         IJ.run(mask, "Analyze Particles...", "size="+str(self.minimalArea)+"-Infinity circularity=0.00-1.00 show=Nothing add stack")
         roiManager.runCommand(self.inputImage, "Show All");
         self.rois = list(RoiManager.getInstance().getRoisAsArray())
+
